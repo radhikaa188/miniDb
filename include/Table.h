@@ -5,12 +5,16 @@
 #include <memory>
 #include "Row.h"
 #include "Column.h"
+#include "Config.h"
+#include "BufferManager.h"
+
 using namespace std;
 
 class Table {
 private:
     map<string, unique_ptr<Column>> schema;
     vector<string> columnNames;
+    unique_ptr<BufferManager> bufferManager = nullptr;
 public:
     vector<Row> rows;
 
@@ -53,4 +57,6 @@ public:
     void deleteWhere(string colName, string value);
     
     void updateWhere(string setCol, string newValue, string whereCol, string whereValue);
+
+    void initBufferManager(string fileName);
 };
