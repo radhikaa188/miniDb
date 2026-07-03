@@ -10,7 +10,7 @@ Row:: Row(vector<string> vals) {
         currId=nextId;
         nextId=nextId+1;
     }
-string Row::getValue(int idx) {
+string Row::getValue(int idx) const{
         return values[idx];
     }
 

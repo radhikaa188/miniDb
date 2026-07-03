@@ -3,10 +3,12 @@
 #include<map>
 #include<vector>
 #include <memory>
+#include <mutex>
 #include "Row.h"
 #include "Column.h"
 #include "Config.h"
 #include "BufferManager.h"
+#include "BTree.h"
 
 using namespace std;
 
@@ -15,6 +17,8 @@ private:
     map<string, unique_ptr<Column>> schema;
     vector<string> columnNames;
     unique_ptr<BufferManager> bufferManager = nullptr;
+    unique_ptr<BTree> btree;
+    mutable std::mutex tableMutex;
 public:
     vector<Row> rows;
 
