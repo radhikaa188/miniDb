@@ -100,13 +100,30 @@ int Table::rowCount() {
     return rows.size();
 }
 void Table::selectAll() {
-    for (int i = 0; i < rows.size(); i++) {
-        for(int j=0; j<schema.size(); j++){
-            string colName = columnNames[j];
-            schema[colName]->print(rows[i].getValue(j));
-            if(j < columnNames.size()-1) cout << " | "; 
+    if (bufferManager == nullptr) {
+        // .idx abhi exist nahi karta (pehla INSERT se pehle SELECT)
+        for (int i = 0; i < rows.size(); i++) {
+            for (int j = 0; j < schema.size(); j++) {
+                string colName = columnNames[j];
+                schema[colName]->print(rows[i].getValue(j));
+                if (j < columnNames.size()-1) cout << " | ";
+            }
+            cout << "\n";
         }
-        cout<<"\n";
+        return;
+    }
+
+    int numPages = bufferManager->getNumPages();
+    for (int p = 0; p < numPages; p++) {
+        vector<Row> page = bufferManager->getPage(p);   // cache hit ya disk load
+        for (int i = 0; i < page.size(); i++) {
+            for (int j = 0; j < schema.size(); j++) {
+                string colName = columnNames[j];
+                schema[colName]->print(page[i].getValue(j));
+                if (j < columnNames.size()-1) cout << " | ";
+            }
+            cout << "\n";
+        }
     }
 }
 
@@ -166,7 +183,13 @@ void Table::saveToFile(string fileName){
     int rowCount = rows.size();
     outFile.write((char*)&rowCount, sizeof(int));   //total rows phle
 
+    vector<long long> pageOffsets;  // har page ki starting byte position
+
     for(int i=0; i<rowCount; i++){
+
+        if (i % PAGE_SIZE == 0) {
+            pageOffsets.push_back((long long)outFile.tellp());  // page start ka offset record karo
+        }
         int valCount=rows[i].size();
         outFile.write((char*)&valCount, sizeof(int));
 
@@ -178,7 +201,17 @@ void Table::saveToFile(string fileName){
         }
     }
     outFile.close();
+    string idxFile = fileName.substr(0, fileName.size() - 3) + ".idx";
+    ofstream idx(idxFile, ios::binary);
+    int numPages = pageOffsets.size();
+    idx.write((char*)&numPages, sizeof(int));
+    for (long long offset : pageOffsets) {
+        idx.write((char*)&offset, sizeof(long long));
+    }
+    idx.close();
+    initBufferManager(fileName);  // .idx naya bana, buffer manager reinitialize karo
 }
+
 void Table::loadFromFile(string fileName){
     try{
         ifstream inFile(fileName, ios::binary);
@@ -206,6 +239,11 @@ void Table::loadFromFile(string fileName){
             rows.push_back(r);
         }
         inFile.close();
+        ifstream idxCheck(fileName.substr(0, fileName.size() - 3) + ".idx");
+        if (idxCheck.good()) {
+            idxCheck.close();
+            initBufferManager(fileName);
+        }
     }catch(exception &e){
         cout<<"error loading file: "<<e.what()<< "\n";
     }
@@ -257,4 +295,8 @@ void Table::updateWhere(string setCol, string newValue, string whereCol, string 
             rows[i].setValue(setIdx, newValue);
         }
     }
+}
+
+void Table::initBufferManager(string fileName) {
+    bufferManager = make_unique<BufferManager>(fileName);
 }
