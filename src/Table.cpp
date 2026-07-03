@@ -81,6 +81,16 @@ void Table::loadSchema(string fileName) {
 
 Table& Table::insertRow(const Row &r) {
     rows.push_back(r);
+    int rowIndex = rows.size() - 1;  // nai row ka index
+
+    // btree initialize karo agar pehli baar hai
+    if (btree == nullptr) {
+        btree = make_unique<BTree>();
+    }
+
+    // first column ki value key banegi
+    string key = r.getValue(0);
+    btree->insert(key, rowIndex);
     return *this;
 }
 
@@ -141,6 +151,22 @@ void Table::selectWhereCondition(string colName, string op, string value) {
     }
     if (colIndex == -1) throw InvalidQueryException();
 
+    // B-Tree path — sirf indexed column (first col) aur "=" operator ke liye
+    if (colIndex == 0 && op == "=" && btree != nullptr) {
+        int rowIndex = btree->search(value);
+        if (rowIndex == -1) {
+            cout << "No rows found.\n";
+            return;
+        }
+        for (int j = 0; j < columnNames.size(); j++) {
+            schema[columnNames[j]]->print(rows[rowIndex].getValue(j));
+            if (j < columnNames.size() - 1) cout << " | ";
+        }
+        cout << "\n";
+        return;
+    }
+
+    // Linear scan fallback — >, < operators ya non-indexed columns ke liye
     for (int i = 0; i < rows.size(); i++) {
         string actual = rows[i].getValue(colIndex);
         bool matches = false;
@@ -162,7 +188,6 @@ void Table::selectWhereCondition(string colName, string op, string value) {
         }
     }
 }
-
 void Table::selectOrderBy(string colName) {
     int colIndex = -1;
     for (int i = 0; i < columnNames.size(); i++) {
@@ -243,6 +268,10 @@ void Table::loadFromFile(string fileName){
         if (idxCheck.good()) {
             idxCheck.close();
             initBufferManager(fileName);
+        }
+        btree = make_unique<BTree>();
+        for (int i = 0; i < rows.size(); i++) {
+            btree->insert(rows[i].getValue(0), i);
         }
     }catch(exception &e){
         cout<<"error loading file: "<<e.what()<< "\n";

@@ -10,7 +10,7 @@ private:
 public:
     explicit Row(vector<string> vals);
 
-    string getValue(int idx);
+    string getValue(int idx) const;
 
     int size();
 

@@ -7,6 +7,7 @@
 #include "Column.h"
 #include "Config.h"
 #include "BufferManager.h"
+#include "BTree.h"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ private:
     map<string, unique_ptr<Column>> schema;
     vector<string> columnNames;
     unique_ptr<BufferManager> bufferManager = nullptr;
+    unique_ptr<BTree> btree;
 public:
     vector<Row> rows;
 
