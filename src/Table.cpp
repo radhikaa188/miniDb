@@ -80,6 +80,7 @@ void Table::loadSchema(string fileName) {
 }
 
 Table& Table::insertRow(const Row &r) {
+    std::lock_guard<std::mutex> lock(tableMutex);  // lock liya
     rows.push_back(r);
     int rowIndex = rows.size() - 1;  // nai row ka index
 
@@ -294,6 +295,7 @@ void Table::orderBy(int colIndex) {
     simpleSort(rows, compareRowsAscending);   // phir sort karo
 }
 void Table::deleteWhere(string colName, string value) {
+    std::lock_guard<std::mutex> lock(tableMutex);  // lock liya
     int colIndex = -1;
     for (int i = 0; i < columnNames.size(); i++) {
         if (columnNames[i] == colName) {
@@ -312,6 +314,7 @@ void Table::deleteWhere(string colName, string value) {
     rows = newRows;
 }
 void Table::updateWhere(string setCol, string newValue, string whereCol, string whereValue) {
+    std::lock_guard<std::mutex> lock(tableMutex);  // lock liya
     int setIdx = -1, whereIdx = -1;
     for (int i = 0; i < columnNames.size(); i++) {
         if (columnNames[i] == setCol) setIdx = i;
