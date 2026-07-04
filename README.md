@@ -429,6 +429,3 @@ Requirements:
 * GCC/G++ with C++17 support
 * pthread
 * Linux, WSL, or MSYS2 MinGW64
-
-```
-```
