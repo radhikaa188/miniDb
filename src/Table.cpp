@@ -111,7 +111,6 @@ int Table::rowCount() {
     return rows.size();
 }
 void Table::selectAll() {
-    if (bufferManager == nullptr) {
         // .idx abhi exist nahi karta (pehla INSERT se pehle SELECT)
         for (int i = 0; i < rows.size(); i++) {
             for (int j = 0; j < schema.size(); j++) {
@@ -120,22 +119,7 @@ void Table::selectAll() {
                 if (j < columnNames.size()-1) cout << " | ";
             }
             cout << "\n";
-        }
-        return;
-    }
-
-    int numPages = bufferManager->getNumPages();
-    for (int p = 0; p < numPages; p++) {
-        vector<Row> page = bufferManager->getPage(p);   // cache hit ya disk load
-        for (int i = 0; i < page.size(); i++) {
-            for (int j = 0; j < schema.size(); j++) {
-                string colName = columnNames[j];
-                schema[colName]->print(page[i].getValue(j));
-                if (j < columnNames.size()-1) cout << " | ";
-            }
-            cout << "\n";
-        }
-    }
+   }
 }
 
 vector<Row> Table::selectWhere(bool (*predicate)(Row)) {
