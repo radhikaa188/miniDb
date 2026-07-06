@@ -164,6 +164,13 @@ int main(){
             } catch (exception& e) {
                 cout << "Error: " << e.what() << "\n";
             }
+        }else if (command == "DROP") {
+            if (tokens.size() < 3) {
+                cout << "Error: Usage: DROP TABLE name\n";
+                continue;
+            }
+            string tableName = tokens[2];
+            manager.dropTable(tableName);
         }
         else{
             cout<<"Unknown command\n";

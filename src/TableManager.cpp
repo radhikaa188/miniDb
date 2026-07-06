@@ -71,3 +71,19 @@ void TableManager::rollbackTransaction() {
 bool TableManager::isInTransaction() {
     return inTransaction;
 }
+
+void TableManager::dropTable(string name) {
+    if (tableNames.count(name) == 0) {
+        cout << "Error: table '" << name << "' does not exist\n";
+        return;
+    }
+    tables.erase(name);
+    tableNames.erase(name);
+
+    // disk files bhi delete karo
+    remove((name + ".db").c_str());
+    remove((name + ".schema").c_str());
+    remove((name + ".idx").c_str());
+
+    cout << "Table '" << name << "' dropped.\n";
+}

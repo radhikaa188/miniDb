@@ -24,4 +24,5 @@ private:
     void rollbackTransaction();
     void touchForTransaction(string tableName);   // called before any write, takes backup if needed
     bool isInTransaction();
+    void dropTable(string name);
 };
