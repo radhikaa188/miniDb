@@ -23,6 +23,8 @@ The goal is not to compete with production databases, but to understand how data
 
 [![MiniDB Demo](https://img.youtube.com/vi/qTJ2OVQwmyI/maxresdefault.jpg)](https://youtu.be/qTJ2OVQwmyI)
 
+---
+
 ## ✨ Highlights
 
 * Persistent storage using custom binary files
