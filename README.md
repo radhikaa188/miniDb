@@ -21,7 +21,7 @@ The goal is not to compete with production databases, but to understand how data
 
 ## Demo
 
-[![MiniDB Demo](https://img.youtube.com/vi/qTJ2OVQwmyI/maxresdefault.jpg)](https://youtu.be/qTJ2OVQwmyI)
+[![MiniDB Demo](https://img.youtube.com/vi/n9NxXxheNTE/maxresdefault.jpg)](https://youtu.be/n9NxXxheNTE)
 
 ---
 
