@@ -296,6 +296,10 @@ void Table::deleteWhere(string colName, string value) {
         }
     }
     rows = newRows;
+    btree = make_unique<BTree>();
+for (int i = 0; i < rows.size(); i++) {
+    btree->insert(rows[i].getValue(0), i);
+}
 }
 void Table::updateWhere(string setCol, string newValue, string whereCol, string whereValue) {
     std::lock_guard<std::mutex> lock(tableMutex);  // lock liya
@@ -311,6 +315,10 @@ void Table::updateWhere(string setCol, string newValue, string whereCol, string 
             rows[i].setValue(setIdx, newValue);
         }
     }
+    btree = make_unique<BTree>();
+for (int i = 0; i < rows.size(); i++) {
+    btree->insert(rows[i].getValue(0), i);
+}
 }
 
 void Table::initBufferManager(string fileName) {
